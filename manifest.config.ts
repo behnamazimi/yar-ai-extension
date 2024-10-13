@@ -25,4 +25,10 @@ export default defineManifest(async (env) => ({
         js: ["src/ui/content/main.tsx"],
       },
     ],
-  }));
+    icons: {
+      16: "src/assets/icons/icon16.png",
+      32: "src/assets/icons/icon32.png",
+      48: "src/assets/icons/icon48.png",
+      128: "src/assets/icons/icon128.png"
+    },
+}));
