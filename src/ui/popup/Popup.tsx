@@ -1,3 +1,4 @@
+import React from "react";
 import "./Popup.css";
 import logo from "../../assets/icons/icon128.png";
 

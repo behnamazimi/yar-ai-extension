@@ -6,5 +6,5 @@ ReactDOM.createRoot(
   document.getElementById("yar-ai-welcome") as HTMLElement).render(
   <React.StrictMode>
     <Welcome />
-  </React.StrictMode>,
+  </React.StrictMode>
 );

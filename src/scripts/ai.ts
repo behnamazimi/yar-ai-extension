@@ -11,7 +11,7 @@ async function createSession<T extends AIMethod>(
   method: T
 ): Promise<AIMethodToSession[T] | undefined> {
   if (!(await isAssistantReady())) {
-    throw new Error(`AI methods are not ready`);
+    throw new Error("AI methods are not ready");
   }
   return window.ai?.[method]?.create() as (AIMethodToSession[T] | undefined);
 }

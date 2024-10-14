@@ -4,19 +4,19 @@ import Content from "./Content";
 
 console.log("Hello from content script");
 
-if(window.ai !== undefined) {
-  console.log("AI is loaded")
+if (window.ai !== undefined) {
+  console.log("AI is loaded");
   const callIt = async () => {
-    const session = await window.ai?.assistant.create()
-    if(session === undefined) {
-      return "Session is undefined"
+    const session = await window.ai?.assistant.create();
+    if (session === undefined) {
+      return "Session is undefined";
     }
-    return await session.prompt(`Hello, Yar! May I ask you a question?`)
-  }
+    return await session.prompt("Hello, Yar! May I ask you a question?");
+  };
 
   callIt()
     .then((response) => {
-      console.log(response)
+      console.log(response);
     });
 }
 
@@ -27,5 +27,5 @@ document.body.appendChild(root);
 ReactDOM.createRoot(root as HTMLElement).render(
   <React.StrictMode>
     <Content />
-  </React.StrictMode>,
+  </React.StrictMode>
 );
