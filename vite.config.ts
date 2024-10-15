@@ -9,6 +9,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
+        dialog: "quick-dialog.html",
         welcome: "welcome.html"
       }
     }

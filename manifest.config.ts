@@ -22,7 +22,7 @@ export default defineManifest(async env => ({
     {
       run_at: "document_start",
       matches: ["<all_urls>"],
-      js: ["src/ui/content/main.tsx"]
+      js: ["src/ui/content/initializer.tsx"]
     }
   ],
   icons: {
