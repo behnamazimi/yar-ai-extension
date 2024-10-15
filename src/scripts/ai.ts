@@ -1,35 +1,20 @@
-type AIMethodToSession = {
-  assistant: AITextSession;
-  summarizer: AISummarizerSession;
-  writer: AIWriterSession;
-  rewriter: AIRewriterSession;
-};
-
-type AIMethod = keyof AIMethodToSession;
-
-async function createSession<T extends AIMethod>(
-  method: T
-): Promise<AIMethodToSession[T] | undefined> {
-  if (!(await isAssistantReady())) {
-    throw new Error("AI methods are not ready");
-  }
-  return window.ai?.[method]?.create() as (AIMethodToSession[T] | undefined);
+export function createAssistantSession(systemPrompt?: string, options?: AILanguageModelCreateOptions) {
+  return window.ai?.languageModel?.create({
+    ...options,
+    systemPrompt
+  });
 }
 
-export function createAssistantSession(): Promise<AITextSession | undefined> {
-  return createSession("assistant");
+export function createSummarizerSession(options?: AISummarizerCreateOptions) {
+  return window.ai?.summarizer?.create(options);
 }
 
-export function createSummarizerSession(): Promise<AISummarizerSession | undefined> {
-  return createSession("summarizer");
+export function createWriterSession(options?: AIWriterCreateOptions) {
+  return window.ai?.writer?.create(options);
 }
 
-export function createWriterSession(): Promise<AIWriterSession | undefined> {
-  return createSession("writer");
-}
-
-export function createRewriterSession(): Promise<AIRewriterSession | undefined> {
-  return createSession("rewriter");
+export function createRewriterSession(options?: AIRewriterCreateOptions) {
+  return window.ai?.rewriter?.create(options);
 }
 
 export async function isAssistantReady(): Promise<boolean> {
@@ -40,11 +25,11 @@ export async function isAssistantReady(): Promise<boolean> {
   return capabilities?.available === "readily";
 }
 
-export async function getAssistantCapabilities(): Promise<AIAssistantCapabilities> {
+export async function getAssistantCapabilities() {
   if (!isAIReady()) {
     throw new Error("AI is not ready");
   }
-  return window.ai?.assistant?.capabilities();
+  return window.ai?.languageModel?.capabilities();
 }
 
 export function isAIReady(): boolean {

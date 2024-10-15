@@ -4,7 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "typeRoots": ["@types/dom-chromium-ai"],
   },
   "include": ["vite.config.ts", "manifest.config.ts", "package.json"]
 }
