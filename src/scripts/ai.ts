@@ -1,3 +1,11 @@
+// polyfill for the new method languageModel
+if (!window.ai?.languageModel) {
+  Object.assign(window.ai, {
+    // @ts-expect-error "languageModel" is not defined
+    languageModel: window.ai.assistant
+  });
+}
+
 export function createAssistantSession(systemPrompt?: string, options?: AILanguageModelCreateOptions) {
   return window.ai?.languageModel?.create({
     ...options,
@@ -17,21 +25,14 @@ export function createRewriterSession(options?: AIRewriterCreateOptions) {
   return window.ai?.rewriter?.create(options);
 }
 
-export async function isAssistantReady(): Promise<boolean> {
-  if (!isAIReady()) {
-    return false;
-  }
-  const capabilities = await getAssistantCapabilities();
-  return capabilities?.available === "readily";
-}
-
 export async function getAssistantCapabilities() {
-  if (!isAIReady()) {
+  if (!await isAIReady()) {
     throw new Error("AI is not ready");
   }
   return window.ai?.languageModel?.capabilities();
 }
 
-export function isAIReady(): boolean {
-  return typeof window.ai !== "undefined";
+export async function isAIReady(): Promise<boolean> {
+  return typeof window?.ai?.languageModel !== "undefined"
+    && (await window.ai.languageModel.capabilities()).available === "readily";
 }
