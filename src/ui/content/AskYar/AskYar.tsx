@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import * as aiUtils from "../../../scripts/ai";
 import { Textarea } from "@headlessui/react";
 
-function Dialog() {
+function AskYar() {
   const responseRef = useRef<HTMLParagraphElement | null>(null);
   const [prompt, setPrompt] = React.useState<string>("");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,4 +134,4 @@ function Dialog() {
   );
 }
 
-export default Dialog;
+export default AskYar;

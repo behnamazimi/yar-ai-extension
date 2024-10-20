@@ -30,5 +30,11 @@ export default defineManifest(async env => ({
     32: "src/assets/icons/icon32.png",
     48: "src/assets/icons/icon48.png",
     128: "src/assets/icons/icon128.png"
-  }
+  },
+  web_accessible_resources: [
+    {
+      resources: ["content-iframe.html"],
+      matches: ["<all_urls>"]
+    }
+  ]
 }));
