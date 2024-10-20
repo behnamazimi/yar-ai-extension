@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import * as aiUtils from "../../../scripts/ai";
 import { Textarea } from "@headlessui/react";
 import { getAiMethodBasedOnUserInput } from "../../../scripts/ai";
+import { sendMessageToCurrentTab } from "../../../utils/messaging";
 
 function AskYar() {
   const responseRef = useRef<HTMLParagraphElement | null>(null);
@@ -13,6 +14,7 @@ function AskYar() {
     sender: "user" | "system";
     text: string;
   }[]>([]);
+  const [selectedContext, setSelectedContext] = React.useState<string | undefined>();
 
   React.useEffect(() => {
     // Scroll to the bottom of the chat whenever messages update
@@ -21,9 +23,17 @@ function AskYar() {
     }
   }, [messages]);
 
+  React.useEffect(() => {
+    sendMessageToCurrentTab({ action: "GET_SELECTED_TEXT" }).then((response) => {
+      setSelectedContext(response.data?.trim());
+    });
+  }, []);
+
   const handleSubmit = async (event?: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
-    if (!responseRef.current) {
+
+    let finalPrompt = prompt.trim();
+    if (!responseRef.current || !prompt.trim()) {
       return;
     }
 
@@ -31,6 +41,10 @@ function AskYar() {
 
     let session = sessionRef.current;
     let stream: AsyncIterable<string> | undefined;
+
+    if (selectedContext && !session) {
+      finalPrompt = `Using this context: ${selectedContext}, Instruction: ${prompt.trim()}`;
+    }
 
     if (!session) {
       const selectedMethod = event?.currentTarget?.aiMethod.value || "autoDetect";
@@ -53,39 +67,41 @@ function AskYar() {
       switch (effectiveMethodRef.current) {
         case "summarizer":
           session = await aiUtils.createSummarizerSession();
-          stream = session?.summarizeStreaming(prompt.trim());
+          stream = session?.summarizeStreaming(finalPrompt);
           break;
         case "writer":
           session = await aiUtils.createWriterSession();
-          stream = session?.writeStreaming(prompt.trim());
+          stream = session?.writeStreaming(finalPrompt);
           break;
         case "rewriter":
           session = await aiUtils.createRewriterSession();
-          stream = session?.rewriteStreaming(prompt.trim());
+          stream = session?.rewriteStreaming(finalPrompt);
           break;
         default:
           session = await aiUtils.createAssistantSession(undefined, {
-            topK: 8,
-            temperature: 0.6
+            topK: 20,
+            temperature: 0.8
           });
-          stream = session?.promptStreaming(prompt.trim());
+          stream = session?.promptStreaming(finalPrompt);
       }
       sessionRef.current = session;
     }
 
-    console.log("creating stream for", effectiveMethodRef.current);
-    switch (effectiveMethodRef.current) {
-      case "summarizer":
-        stream = session?.summarizeStreaming(prompt.trim());
-        break;
-      case "writer":
-        stream = session?.writeStreaming(prompt.trim());
-        break;
-      case "rewriter":
-        stream = session?.rewriteStreaming(prompt.trim());
-        break;
-      default:
-        stream = session?.promptStreaming(prompt.trim());
+    if (!stream) {
+      console.log("creating stream for", effectiveMethodRef.current);
+      switch (effectiveMethodRef.current) {
+        case "summarizer":
+          stream = session?.summarizeStreaming(finalPrompt);
+          break;
+        case "writer":
+          stream = session?.writeStreaming(finalPrompt);
+          break;
+        case "rewriter":
+          stream = session?.rewriteStreaming(finalPrompt);
+          break;
+        default:
+          stream = session?.promptStreaming(finalPrompt);
+      }
     }
 
     if (!stream) {
@@ -100,7 +116,6 @@ function AskYar() {
         const lastMessage = prev[prev.length - 1];
 
         if (lastMessage?.sender !== "system") {
-          console.log("system");
           return [...prev, { sender: "system", text: chunk.trim() }];
         }
 
@@ -151,7 +166,7 @@ function AskYar() {
           onChange={e => setPrompt(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={3}
-          maxLength={2024}
+          maxLength={4048}
           required
           value={prompt}
           style={{ width: "100%" }}
@@ -163,6 +178,22 @@ function AskYar() {
           </button>
         </div>
       </form>
+
+      {!!selectedContext && (
+        <div style={{
+          padding: "10px",
+          border: "1px solid black",
+          marginBottom: "1rem",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+          overflow: "hidden"
+        }}
+        >
+          <strong>Context:</strong>
+          {" "}
+          {selectedContext}
+        </div>
+      )}
 
       <div
         ref={responseRef}

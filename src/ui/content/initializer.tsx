@@ -1,3 +1,6 @@
+import { MessagePayload, MessageResponseCallback } from "../../types";
+import MessageSender = chrome.runtime.MessageSender;
+
 type IframeName = "ask-yar";
 
 type UIElements = {
@@ -13,6 +16,19 @@ const uiElements: UIElements = {
 const initStyles = () => {
   const style = document.createElement("style");
   style.innerHTML = `
+    #toggle-content-iframe {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 9999999999999;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #2b6cb0;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
     .yar-iframe {
       position: fixed;
       top: 50%;
@@ -67,6 +83,7 @@ const createIframe = (name: IframeName) => {
   // check if iframe already exists
   const iframe = document.getElementById(`${name}-iframe`) as HTMLIFrameElement;
   if (iframe) {
+    iframe.contentDocument?.location.reload();
     return iframe;
   }
 
@@ -114,5 +131,20 @@ window.addEventListener("click", (event) => {
     && uiElements.toggleAskYarButton !== event.target) {
     // check if click is not from the toggle button
     iframe.classList.add("hidden");
+    setTimeout(() => {
+      iframe.remove();
+      uiElements.contentIframe = null;
+    }, 250);
   }
 });
+
+chrome.runtime.onMessage.addListener(handleMessages);
+
+function handleMessages(request: MessagePayload, sender: MessageSender, sendResponse: MessageResponseCallback): void {
+  if (request.action === "GET_SELECTED_TEXT") {
+    sendResponse({
+      action: "GET_SELECTED_TEXT",
+      data: window.getSelection()?.toString() || ""
+    });
+  }
+}

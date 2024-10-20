@@ -38,24 +38,26 @@ export async function isAIReady(): Promise<boolean> {
 }
 
 export async function getAiMethodBasedOnUserInput(userInput: string) {
-  const generativePrompt = `Analyze the "User Input" below and determine the most relevant function you can get the response with: assistant, writer, summarizer, or rewriter. Respond with the function name only, 1 word max.
+  const generativePrompt = `Analyze the "User Input" and determine the most relevant function - assistant, writer, summarizer, or rewriter - that can provide the best response.
 Follow these rules:
-- Assistant: User asks a question, requests information, or seeks assistance on different topics like writing a code.
+- Respond with the function name only, 1 word maximum.
+- It's Assistant if: User asks a question, requests information, or seeks assistance on different topics like writing a code.
   - Example: "What is the capital of France?", "Can you help me find a recipe for pasta?", "I need assistance with my homework.", "Write a coding function in Python."
-- Writer: User requests content creation, such as articles, stories, or poems
+- It's Writer if: User requests content creation, such as articles, stories, or poems
   - Example: "Write a short story about a dragon", "Create a poem about love", "Write an article about the benefits of exercise."
-- Summarizer: User provides a block of text and requests a summary or key points.
+- It's Summarizer if: User provides a block of text and requests a summary or key points.
   - Example: "Summarize this article for me.", "Can   you give me the main points from this paragraph?", "What are the key takeaways from this report?"
-- Rewriter: User asks to rephrase, edit or grammar check.
+- It's Rewriter if: User asks to rephrase, edit or grammar check.
   - Example: "Can you rewrite this sentence?", "Edit this paragraph for me.", "Improve the grammar in this text.", "Improve the clarity of this paragraph"
 
-User Input: ${userInput}`;
+User Input: ${userInput}
+`;
 
   const session = await createAssistantSession(generativePrompt, {
-    topK: 1,
-    temperature: 0.0
+    topK: 3,
+    temperature: 0.2
   });
   const response = await session?.prompt(generativePrompt);
   session?.destroy();
-  return response.toLowerCase().trim();
+  return response.toLowerCase().trim().split(" ")[0];
 }
