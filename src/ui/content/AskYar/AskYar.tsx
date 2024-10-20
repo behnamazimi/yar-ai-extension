@@ -131,10 +131,8 @@ function AskYar() {
     }
   };
 
-  console.log(messages);
-
   return (
-    <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "calc(100vh - 2rem)" }}>
+    <div style={{ position: "relative", display: "flex", flexDirection: "column", height: "calc(100vh - 1rem)" }}>
       <form onSubmit={handleSubmit} style={{ position: "sticky", top: "0", marginBottom: "1rem" }}>
         <div>
           <input type="radio" id="auto" name="aiMethod" value="autoDetect" defaultChecked />
@@ -161,7 +159,7 @@ function AskYar() {
         <div>
           <button type="submit">Ask</button>
           <button onClick={onDestroySession} type="button">
-            Destroy session
+            Start fresh
           </button>
         </div>
       </form>
@@ -180,6 +178,11 @@ function AskYar() {
             {msg.text}
           </div>
         ))}
+      </div>
+      <div>
+        <strong>Method:</strong>
+        {" "}
+        {effectiveMethodRef.current || "Auto Detect"}
       </div>
     </div>
   );

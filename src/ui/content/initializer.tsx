@@ -22,7 +22,7 @@ const initStyles = () => {
       visibility: visible;
       opacity: 1;
       height: auto;
-      min-height: 248px;
+      min-height: 348px;
       border-radius: 8px;
       transform: translate(-50%, -50%) scale(0);
       border: 1px solid #e2e8f0;
